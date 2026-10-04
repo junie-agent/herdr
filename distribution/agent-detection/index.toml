@@ -45,6 +45,10 @@ id = "hermes"
 path = "hermes.toml"
 
 [[agents]]
+id = "junie"
+path = "junie.toml"
+
+[[agents]]
 id = "kilo"
 path = "kilo.toml"
 

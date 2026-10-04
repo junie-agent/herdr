@@ -1417,6 +1417,17 @@
             "on",
             "off"
           ]
+        },
+        {
+          "key": "ui.sound.agents.junie",
+          "type": "enum",
+          "default": "\"default\"",
+          "description": "Sound override for detected Junie agents.",
+          "values": [
+            "default",
+            "on",
+            "off"
+          ]
         }
       ]
     },

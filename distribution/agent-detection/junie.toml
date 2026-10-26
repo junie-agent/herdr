@@ -1,25 +1,24 @@
 id = "junie"
-version = "2026.10.05.1"
+version = "2026.10.26.1"
 min_engine_version = 2
-updated_at = "2026-10-05T00:00:00Z"
+updated_at = "2026-10-26T00:00:00Z"
 
-# Junie CLI (JetBrains) draws its chrome at the bottom of the main buffer. The
-# idle input box sits above a status bar such as
-# "~ work   ⚑ Brave off ctrl + b   ⌘ <model> ...". While a turn runs, a braille
-# spinner row with an "esc to stop" hint appears above the input box. Tool
-# approvals (brave mode off) replace the input box and status bar with a titled
-# "Allow ...?" question followed by "Allow once", "Always allow (...)", "Deny",
-# and "Or reject with a reason". The first launch in a directory asks for a
-# project trust decision, and the model picker lists per-Mtok prices.
-#
-# Evidence: Junie 26.9.22 (3419.7), captured with `herdr agent read <pane>
-# --source detection --format text`. Junie emits OSC notifications but no
-# OSC 9;4 progress, so these screen rules are the only state evidence.
+# Junie emits OSC 9;4 progress inside Herdr since JetBrains/junie-agent#8221.
+# Screen rules cover older versions and progress overwritten by OSC 9
+# notifications. Visible prompts stay blocked under working or idle progress.
+
+[[rules]]
+id = "osc_progress_blocked"
+state = "blocked"
+priority = 1400
+region = "osc_progress"
+visible_blocker = true
+regex = ['^4;4(?:;|$)']
 
 [[rules]]
 id = "tool_approval_blocked"
 state = "blocked"
-priority = 1100
+priority = 1300
 region = "bottom_non_empty_lines(8)"
 visible_blocker = true
 contains = ["allow once"]
@@ -32,7 +31,7 @@ any = [
 [[rules]]
 id = "project_trust_blocked"
 state = "blocked"
-priority = 1090
+priority = 1290
 region = "bottom_non_empty_lines(8)"
 visible_blocker = true
 contains = ["needs your trust decision"]
@@ -44,10 +43,29 @@ any = [
 [[rules]]
 id = "model_picker_overlay"
 state = "unknown"
-priority = 1050
+priority = 1250
 region = "bottom_non_empty_lines(6)"
 skip_state_update = true
-line_regex = ['\$\d+\.\d+\s+\$\d+\.\d+\s+per Mtok']
+any = [
+  { line_regex = ['\$\d+\.\d+\s+\$\d+\.\d+\s+per Mtok'] },
+  { line_regex = ['^\s*tab / shift\+tab to switch tabs\s*$'] },
+]
+
+[[rules]]
+id = "osc_progress_working"
+state = "working"
+priority = 1200
+region = "osc_progress"
+visible_working = true
+regex = ['^4;3(?:;|$)']
+
+[[rules]]
+id = "osc_progress_idle"
+state = "idle"
+priority = 1150
+region = "osc_progress"
+visible_idle = true
+regex = ['^4;[02](?:;|$)']
 
 [[rules]]
 id = "working_spinner_stop_hint"
